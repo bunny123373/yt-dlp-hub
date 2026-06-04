@@ -42,8 +42,9 @@ async function checkServer() {
   const dot   = $('si-dot');
   const label = $('si-label');
   try {
-    const r = await fetch(`${API}/api/health`, { signal: AbortSignal.timeout(3000) }).catch(() => null);
-    if (!r) throw new Error('No response');
+    const r = await fetch(`${API}/api/health`, { signal: AbortSignal.timeout(5000) }).catch(() => null);
+    if (!r) throw new Error('offline');
+    // any HTTP response means server is up
     dot.className = 'si-dot online';
     label.textContent = 'Server Online';
     return true;
@@ -157,7 +158,6 @@ async function startDownload() {
     return;
   }
 
-  currentTitle = '';
   dlBtn.disabled = true;
   dlBtn.classList.add('loading');
   dlBtnText.textContent = 'Starting…';
