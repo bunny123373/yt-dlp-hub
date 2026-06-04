@@ -118,11 +118,11 @@ function buildYtdlpArgs(opts) {
   if (cookies)                   { args.push('--cookies-from-browser', 'chrome'); }
   if (sponsor)                   { args.push('--sponsorblock-mark', 'all'); }
 
-  // YouTube-specific: bypass bot detection with iOS player client
+  // YouTube: use TV/Android clients — bypass bot detection without cookies
   const isYouTube = /youtube\.com|youtu\.be/.test(url);
   if (isYouTube) {
-    // iOS client bypasses bot detection; web fallback keeps DASH formats available
-    args.push('--extractor-args', 'youtube:player_client=ios,web');
+    // tv_embedded and android clients don't require login/cookies
+    args.push('--extractor-args', 'youtube:player_client=tv_embedded,ios,web');
   }
 
   // Use cookies file if it exists (user-uploaded)
