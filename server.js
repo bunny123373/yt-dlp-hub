@@ -83,12 +83,18 @@ function buildYtdlpArgs(opts) {
   } else if (type === 'subs') {
     args.push('--write-subs', '--write-auto-subs', '--skip-download', '--sub-format', 'srt/best');
   } else {
-    // video
+    // video — robust fallback chain that works with iOS/HLS and DASH
     let fmtStr;
     if (quality === 'best') {
-      fmtStr = 'bestvideo+bestaudio/best';
+      fmtStr = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best';
     } else {
-      fmtStr = `bestvideo[height<=${quality}]+bestaudio/best[height<=${quality}]`;
+      fmtStr = [
+        `bestvideo[height<=${quality}][ext=mp4]+bestaudio[ext=m4a]`,
+        `bestvideo[height<=${quality}]+bestaudio`,
+        `best[height<=${quality}]`,
+        'bestvideo+bestaudio',
+        'best'
+      ].join('/');
     }
     args.push('-f', fmtStr);
     const mfmt = ['mp4', 'mkv', 'webm'].includes(fmt) ? fmt : 'mp4';
@@ -102,11 +108,11 @@ function buildYtdlpArgs(opts) {
   if (cookies)                   { args.push('--cookies-from-browser', 'chrome'); }
   if (sponsor)                   { args.push('--sponsorblock-mark', 'all'); }
 
-  // YouTube-specific: bypass bot detection with iOS/Android player client
+  // YouTube-specific: bypass bot detection with iOS player client
   const isYouTube = /youtube\.com|youtu\.be/.test(url);
   if (isYouTube) {
-    args.push('--extractor-args', 'youtube:player_client=ios,mweb');
-    args.push('--extractor-args', 'youtube:skip=dash');
+    // iOS client bypasses bot detection; web fallback keeps DASH formats available
+    args.push('--extractor-args', 'youtube:player_client=ios,web');
   }
 
   // Use cookies file if it exists (user-uploaded)
