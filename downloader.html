@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YT-DLP Hub — Real Downloader</title>
+  <meta name="description" content="Download videos, music, and playlists from 1000+ sites. Real yt-dlp powered downloader with live progress." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="downloader.css" />
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <img src="avatar.png" alt="YT-DLP Hub" class="brand-img" />
+      <span class="brand-name">YT-DLP<span class="brand-accent"> Hub</span></span>
+    </a>
+    <a href="index.html" class="nav-back">← Back to Hub</a>
+    <div class="server-indicator" id="server-indicator">
+      <span class="si-dot" id="si-dot"></span>
+      <span id="si-label">Connecting…</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Banner -->
+<div class="dl-hero">
+  <div class="dl-hero-bg"></div>
+  <div class="dl-hero-content">
+    <div class="dh-badge">
+      <span class="dh-dot"></span>
+      Powered by yt-dlp 2026.03.17
+    </div>
+    <h1>Real<span class="g-text"> Download</span> Engine</h1>
+    <p>Paste any URL — video, playlist, audio — from 1000+ sites.<br/>Watch it download live, then grab your file.</p>
+  </div>
+</div>
+
+<!-- Main Downloader -->
+<main class="dl-main">
+
+  <!-- ── URL Bar ── -->
+  <div class="url-panel" id="url-panel">
+    <div class="up-inner">
+      <div class="url-field" id="url-field">
+        <div class="url-field-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <input type="url" id="url-input" class="url-input" placeholder="https://youtube.com/watch?v=... or any 1000+ supported URL"
+          autocomplete="off" spellcheck="false" />
+        <button class="url-paste-btn" id="url-paste-btn" title="Paste from clipboard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Paste
+        </button>
+        <button class="url-clear-btn" id="url-clear-btn">✕</button>
+      </div>
+
+      <!-- Detected info -->
+      <div class="url-detect" id="url-detect" style="display:none">
+        <span class="ud-platform" id="ud-platform"></span>
+        <span class="ud-type" id="ud-type"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Options ── -->
+  <div class="opts-panel" id="opts-panel">
+    <div class="opts-grid">
+
+      <!-- Type -->
+      <div class="opt-col" id="opt-type-col">
+        <div class="opt-label">Download Type</div>
+        <div class="opt-pills" id="opt-type-pills">
+          <button class="opill active" data-g="type" data-v="video"     id="op-video">🎬 Video</button>
+          <button class="opill"        data-g="type" data-v="audio"     id="op-audio">🎵 Audio Only</button>
+          <button class="opill"        data-g="type" data-v="thumbnail" id="op-thumb">🖼 Thumbnail</button>
+          <button class="opill"        data-g="type" data-v="subs"      id="op-subs">💬 Subtitles</button>
+        </div>
+      </div>
+
+      <!-- Quality -->
+      <div class="opt-col" id="opt-quality-col">
+        <div class="opt-label">Quality</div>
+        <div class="opt-pills" id="opt-quality-pills">
+          <button class="opill active" data-g="quality" data-v="best" id="op-best">⭐ Best</button>
+          <button class="opill"        data-g="quality" data-v="2160" id="op-4k">4K</button>
+          <button class="opill"        data-g="quality" data-v="1080" id="op-1080">1080p</button>
+          <button class="opill"        data-g="quality" data-v="720"  id="op-720">720p</button>
+          <button class="opill"        data-g="quality" data-v="480"  id="op-480">480p</button>
+          <button class="opill"        data-g="quality" data-v="360"  id="op-360">360p</button>
+        </div>
+      </div>
+
+      <!-- Format -->
+      <div class="opt-col" id="opt-fmt-col">
+        <div class="opt-label">Format</div>
+        <div class="opt-pills" id="opt-fmt-pills">
+          <button class="opill active" data-g="fmt" data-v="mp4"  id="op-mp4">MP4</button>
+          <button class="opill"        data-g="fmt" data-v="webm" id="op-webm">WebM</button>
+          <button class="opill"        data-g="fmt" data-v="mkv"  id="op-mkv">MKV</button>
+          <button class="opill"        data-g="fmt" data-v="mp3"  id="op-mp3">MP3</button>
+          <button class="opill"        data-g="fmt" data-v="flac" id="op-flac">FLAC</button>
+          <button class="opill"        data-g="fmt" data-v="opus" id="op-opus">Opus</button>
+        </div>
+      </div>
+
+      <!-- Toggles -->
+      <div class="opt-col opt-col-toggles" id="opt-toggles-col">
+        <div class="opt-label">Options</div>
+        <div class="toggle-row" id="toggle-row">
+          <label class="tog" id="tog-subs"><input type="checkbox" id="chk-subs"/><span class="tog-sw"></span>Embed Subs</label>
+          <label class="tog" id="tog-thumb"><input type="checkbox" id="chk-thumb"/><span class="tog-sw"></span>Embed Thumb</label>
+          <label class="tog" id="tog-meta"><input type="checkbox" id="chk-meta" checked/><span class="tog-sw"></span>Metadata</label>
+          <label class="tog" id="tog-playlist"><input type="checkbox" id="chk-playlist"/><span class="tog-sw"></span>Playlist</label>
+          <label class="tog" id="tog-cookies"><input type="checkbox" id="chk-cookies"/><span class="tog-sw"></span>Browser Cookies</label>
+          <label class="tog" id="tog-sponsor"><input type="checkbox" id="chk-sponsor"/><span class="tog-sw"></span>SponsorBlock</label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Download Button -->
+    <div class="dl-btn-wrap" id="dl-btn-wrap">
+      <button class="dl-btn" id="dl-btn" disabled>
+        <span class="dl-btn-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </span>
+        <span class="dl-btn-text">Start Download</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Progress Panel ── -->
+  <div class="progress-panel" id="progress-panel" style="display:none">
+
+    <div class="pp-header">
+      <div class="pp-status-row">
+        <div class="pp-status-icon" id="pp-icon">⏳</div>
+        <div class="pp-status-text">
+          <div class="pp-title" id="pp-title">Starting download…</div>
+          <div class="pp-filename" id="pp-filename">Fetching metadata…</div>
+        </div>
+        <button class="pp-cancel" id="pp-cancel">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Big progress bar -->
+    <div class="progress-bar-wrap" id="progress-bar-wrap">
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        <div class="progress-bar-glow" id="progress-bar-glow"></div>
+      </div>
+      <div class="progress-pct" id="progress-pct">0%</div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-item" id="stat-speed">
+        <div class="stat-lbl">Speed</div>
+        <div class="stat-val" id="sv-speed">—</div>
+      </div>
+      <div class="stat-item" id="stat-eta">
+        <div class="stat-lbl">Time Left</div>
+        <div class="stat-val" id="sv-eta">—</div>
+      </div>
+      <div class="stat-item" id="stat-dl">
+        <div class="stat-lbl">Downloaded</div>
+        <div class="stat-val" id="sv-dl">—</div>
+      </div>
+      <div class="stat-item" id="stat-size">
+        <div class="stat-lbl">Total Size</div>
+        <div class="stat-val" id="sv-size">—</div>
+      </div>
+    </div>
+
+    <!-- Log stream -->
+    <div class="log-wrap" id="log-wrap">
+      <div class="log-header">
+        <span>Live Log</span>
+        <button class="log-toggle" id="log-toggle">Hide ▲</button>
+      </div>
+      <div class="log-body" id="log-body"></div>
+    </div>
+
+  </div>
+
+  <!-- ── Done / Download Ready ── -->
+  <div class="done-panel" id="done-panel" style="display:none">
+    <div class="done-inner">
+      <div class="done-icon" id="done-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h2 class="done-title">Download Ready!</h2>
+      <div class="done-filename" id="done-filename">file.mp4</div>
+      <div class="done-filesize" id="done-filesize">— MB</div>
+      <a href="#" class="done-dl-btn" id="done-dl-btn" download>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download File
+      </a>
+      <button class="done-new-btn" id="done-new-btn">↩ Download Another</button>
+      <div class="done-expiry">⏱ File auto-deletes from server in 10 minutes</div>
+    </div>
+  </div>
+
+  <!-- ── Error Panel ── -->
+  <div class="error-panel" id="error-panel" style="display:none">
+    <div class="err-icon">⚠️</div>
+    <div class="err-title" id="err-title">Download Failed</div>
+    <div class="err-msg" id="err-msg">Something went wrong.</div>
+    <button class="err-retry-btn" id="err-retry-btn">↩ Try Again</button>
+  </div>
+
+  <!-- ── Supported Sites Quick List ── -->
+  <div class="sites-section" id="sites-section">
+    <h3 class="sites-title">Supported Sites (1000+)</h3>
+    <div class="sites-chips" id="sites-chips">
+      <span class="sc">▶ YouTube</span><span class="sc">🎵 TikTok</span><span class="sc">🎮 Twitch</span>
+      <span class="sc">📸 Instagram</span><span class="sc">☁ SoundCloud</span><span class="sc">🎬 Vimeo</span>
+      <span class="sc">📘 Facebook</span><span class="sc">🐦 Twitter / X</span><span class="sc">🎧 Bandcamp</span>
+      <span class="sc">📺 Dailymotion</span><span class="sc">🌐 Reddit</span><span class="sc">🎥 Bilibili</span>
+      <span class="sc">📡 Crunchyroll</span><span class="sc">🎙 Mixcloud</span><span class="sc">📺 Rumble</span>
+      <span class="sc">🎞 Niconico</span><span class="sc">🎤 Spotify*</span><span class="sc sc-more">+ 983 more →</span>
+    </div>
+    <p class="sites-note">* Spotify requires additional setup (spotdl). Some sites may require cookies or authentication.</p>
+  </div>
+
+</main>
+
+<script src="downloader.js"></script>
+</body>
+</html>

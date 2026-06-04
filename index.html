@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YT-DLP Hub — Download Anything, From Anywhere</title>
+  <meta name="description" content="YT-DLP Hub is your ultimate resource for downloading videos, music, and playlists from 1000+ sites using yt-dlp. Free tools, guides, and command generator." />
+  <meta name="theme-color" content="#050709" />
+  <meta property="og:title" content="YT-DLP Hub" />
+  <meta property="og:description" content="Download anything from anywhere. The ultimate yt-dlp resource hub." />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOADER
+══════════════════════════════════════ -->
+<div class="loader" id="loader">
+  <div class="loader-inner">
+    <div class="loader-ring"></div>
+    <div class="loader-logo">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="17" stroke="url(#lg1)" stroke-width="2"/>
+        <path d="M14 12l10 6-10 6V12z" fill="url(#lg1)"/>
+        <defs>
+          <linearGradient id="lg1" x1="0" y1="0" x2="36" y2="36">
+            <stop stop-color="#00f5ff"/><stop offset="1" stop-color="#bf5af2"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ══════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="brand" id="brand-logo">
+      <img src="avatar.png" alt="YT-DLP Hub logo" class="brand-img" />
+      <span class="brand-name">YT-DLP<span class="brand-accent"> Hub</span></span>
+    </a>
+
+    <ul class="nav-menu" id="nav-menu">
+      <li><a href="#about"         class="nav-a" id="mn-about">About</a></li>
+      <li><a href="#tools"         class="nav-a" id="mn-tools">Tools</a></li>
+      <li><a href="#tutorials"     class="nav-a" id="mn-tuts">Tutorials</a></li>
+      <li><a href="#generator"     class="nav-a" id="mn-gen">Generator</a></li>
+      <li><a href="#contact"       class="nav-a" id="mn-contact">Contact</a></li>
+      <li><a href="downloader.html" class="nav-a nav-a-dl" id="mn-dl">⚡ Live Downloader</a></li>
+    </ul>
+
+    <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener" class="nav-cta" id="nav-gh-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+      GitHub
+    </a>
+
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-bg-img" style="background-image:url('hero-bg.png')"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-particles" id="particles-js"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow" id="hero-eyebrow">
+      <span class="eyebrow-dot"></span>
+      Content Creator · Downloader Expert · Open Source
+    </div>
+
+    <h1 class="hero-h1" id="hero-h1">
+      <span class="h1-line line-1">Download</span>
+      <span class="h1-line line-2 glow-text">Anything.</span>
+      <span class="h1-line line-3">From <em>Everywhere.</em></span>
+    </h1>
+
+    <p class="hero-sub" id="hero-sub">
+      Welcome to <strong>YT-DLP Hub</strong> — your ultimate resource for mastering yt-dlp.
+      Get guides, commands, and tools to download videos &amp; music from <strong>1000+ platforms</strong>.
+    </p>
+
+    <div class="hero-btns" id="hero-btns">
+      <a href="downloader.html" class="btn-glow" id="hero-gen-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        ⚡ Real Downloader
+      </a>
+      <a href="#generator" class="btn-outline" id="hero-tut-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Command Generator
+      </a>
+    </div>
+
+    <div class="hero-scroll" id="hero-scroll">
+      <div class="scroll-mouse">
+        <div class="scroll-wheel"></div>
+      </div>
+      <span>Scroll to explore</span>
+    </div>
+  </div>
+
+  <div class="hero-floating-cards">
+    <div class="float-card fc1" id="fc1">
+      <div class="fc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <div class="fc-text"><strong>Blazing Fast</strong><br/>Parallel downloads</div>
+    </div>
+    <div class="float-card fc2" id="fc2">
+      <div class="fc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+      <div class="fc-text"><strong>1000+ Sites</strong><br/>All platforms</div>
+    </div>
+    <div class="float-card fc3" id="fc3">
+      <div class="fc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg></div>
+      <div class="fc-text"><strong>100% Free</strong><br/>Open source</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     TICKER
+══════════════════════════════════════ -->
+<div class="ticker-wrap" id="ticker">
+  <div class="ticker-track">
+    <span>YouTube</span><span>TikTok</span><span>Twitch</span>
+    <span>Instagram</span><span>SoundCloud</span><span>Vimeo</span>
+    <span>Facebook</span><span>Twitter / X</span><span>Bandcamp</span>
+    <span>Dailymotion</span><span>Reddit</span><span>Bilibili</span>
+    <span>Crunchyroll</span><span>Mixcloud</span><span>Rumble</span>
+    <span>YouTube</span><span>TikTok</span><span>Twitch</span>
+    <span>Instagram</span><span>SoundCloud</span><span>Vimeo</span>
+    <span>Facebook</span><span>Twitter / X</span><span>Bandcamp</span>
+    <span>Dailymotion</span><span>Reddit</span><span>Bilibili</span>
+    <span>Crunchyroll</span><span>Mixcloud</span><span>Rumble</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ABOUT
+══════════════════════════════════════ -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-visual" id="about-visual">
+        <div class="av-frame">
+          <img src="avatar.png" alt="YT-DLP Hub" class="av-img" />
+          <div class="av-ring av-ring-1"></div>
+          <div class="av-ring av-ring-2"></div>
+          <div class="av-badge av-b1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Content</div>
+          <div class="av-badge av-b2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg> Creator</div>
+        </div>
+        <div class="av-stats">
+          <div class="av-stat" id="avs-0"><span class="av-num" data-target="1000">0</span><span>+</span><div>Sites</div></div>
+          <div class="av-stat" id="avs-1"><span class="av-num" data-target="85">0</span><span>K+</span><div>Stars</div></div>
+          <div class="av-stat" id="avs-2"><span class="av-num" data-target="50">0</span><span>+</span><div>Guides</div></div>
+        </div>
+      </div>
+
+      <div class="about-text" id="about-text">
+        <div class="sec-pill">About YT-DLP Hub</div>
+        <h2 class="sec-title">The Ultimate <span class="glow-text">Downloader</span> Resource</h2>
+        <p class="sec-p">
+          YT-DLP Hub is the go-to destination for anyone who wants to harness the power of <strong>yt-dlp</strong> —
+          the most feature-rich, open-source video downloader ever built.
+        </p>
+        <p class="sec-p">
+          Whether you're a casual user wanting to save a favourite video, or a power user building automated pipelines —
+          we have the guides, commands, and tools you need.
+        </p>
+
+        <div class="about-skills">
+          <div class="skill-row" id="sk-0">
+            <div class="skill-label"><span>yt-dlp Mastery</span><span>97%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-w="97"></div></div>
+          </div>
+          <div class="skill-row" id="sk-1">
+            <div class="skill-label"><span>Platform Coverage</span><span>95%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-w="95"></div></div>
+          </div>
+          <div class="skill-row" id="sk-2">
+            <div class="skill-label"><span>Format Support</span><span>90%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-w="90"></div></div>
+          </div>
+          <div class="skill-row" id="sk-3">
+            <div class="skill-label"><span>Automation &amp; Scripting</span><span>88%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-w="88"></div></div>
+          </div>
+        </div>
+
+        <a href="#tools" class="btn-glow sm" id="about-explore-btn">Explore Tools →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     TOOLS / FEATURES
+══════════════════════════════════════ -->
+<section class="section bg-subtle" id="tools">
+  <div class="container">
+    <div class="sec-header">
+      <div class="sec-pill">Tools & Features</div>
+      <h2 class="sec-title">Everything You <span class="glow-text">Need</span></h2>
+      <p class="sec-desc">Powerful features packed into one command-line powerhouse</p>
+    </div>
+
+    <div class="tools-bento" id="tools-bento">
+
+      <div class="bento-card bc-wide" id="bc-0">
+        <div class="bc-num">01</div>
+        <div class="bc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+        <h3>Multi-Format Download</h3>
+        <p>MP4, WebM, MP3, FLAC, Opus, AAC and dozens more. Choose exactly what you need.</p>
+        <div class="bc-tags">
+          <span>MP4</span><span>MP3</span><span>FLAC</span><span>WebM</span><span>Opus</span>
+        </div>
+        <div class="bc-glow"></div>
+      </div>
+
+      <div class="bento-card" id="bc-1">
+        <div class="bc-num">02</div>
+        <div class="bc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+        <h3>Format Selector</h3>
+        <p>Granular control: resolution, bitrate, codec, HDR, and container in one flag.</p>
+        <div class="bc-glow"></div>
+      </div>
+
+      <div class="bento-card" id="bc-2">
+        <div class="bc-num">03</div>
+        <div class="bc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+        <h3>Playlist &amp; Channel</h3>
+        <p>Download entire playlists, channels, and search results with smart deduplication.</p>
+        <div class="bc-glow"></div>
+      </div>
+
+      <div class="bento-card" id="bc-3">
+        <div class="bc-num">04</div>
+        <div class="bc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></div>
+        <h3>Resume Downloads</h3>
+        <p>Interrupted? yt-dlp picks right back up where it left off. No wasted bandwidth.</p>
+        <div class="bc-glow"></div>
+      </div>
+
+      <div class="bento-card bc-wide" id="bc-4">
+        <div class="bc-num">05</div>
+        <div class="bc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+        <h3>FFmpeg Post-Processing</h3>
+        <p>Automatically merge streams, convert formats, embed thumbnails, add metadata, and extract audio — all in one command.</p>
+        <div class="bc-tags">
+          <span>Merge</span><span>Convert</span><span>Embed</span><span>Trim</span>
+        </div>
+        <div class="bc-glow"></div>
+      </div>
+
+      <div class="bento-card" id="bc-5">
+        <div class="bc-num">06</div>
+        <div class="bc-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3>Cookie Auth</h3>
+        <p>Access age-restricted or members-only content using your browser cookies.</p>
+        <div class="bc-glow"></div>
+      </div>
+
+      <div class="bento-card" id="bc-6">
+        <div class="bc-num">07</div>
+        <div class="bc-icon">💬</div>
+        <h3>Subtitle Extraction</h3>
+        <p>Download and embed subtitles in SRT, VTT, ASS formats from any platform.</p>
+        <div class="bc-glow"></div>
+      </div>
+
+      <div class="bento-card" id="bc-7">
+        <div class="bc-num">08</div>
+        <div class="bc-icon">🚀</div>
+        <h3>Parallel Downloads</h3>
+        <p>Concurrent fragment downloading for lightning-fast speeds with aria2c support.</p>
+        <div class="bc-glow"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     TUTORIALS
+══════════════════════════════════════ -->
+<section class="section" id="tutorials">
+  <div class="container">
+    <div class="sec-header">
+      <div class="sec-pill">Tutorials</div>
+      <h2 class="sec-title">Learn <span class="glow-text">Step by Step</span></h2>
+      <p class="sec-desc">From beginner to power user — our guides cover it all</p>
+    </div>
+
+    <div class="tut-grid" id="tut-grid">
+
+      <div class="tut-card" id="tc-0">
+        <div class="tut-badge beginner">Beginner</div>
+        <div class="tut-thumb">
+          <div class="tut-play">▶</div>
+          <div class="tut-duration">5 min</div>
+          <div class="tut-emoji"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+        </div>
+        <div class="tut-info">
+          <h4>Installing yt-dlp on Any OS</h4>
+          <p>Windows, macOS, Linux — get yt-dlp running in under 5 minutes.</p>
+          <div class="tut-tags"><span>Windows</span><span>macOS</span><span>Linux</span></div>
+        </div>
+      </div>
+
+      <div class="tut-card" id="tc-1">
+        <div class="tut-badge beginner">Beginner</div>
+        <div class="tut-thumb">
+          <div class="tut-play">▶</div>
+          <div class="tut-duration">8 min</div>
+          <div class="tut-emoji"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        </div>
+        <div class="tut-info">
+          <h4>Downloading YouTube Videos</h4>
+          <p>Your first download — best quality, custom format, and more.</p>
+          <div class="tut-tags"><span>YouTube</span><span>MP4</span></div>
+        </div>
+      </div>
+
+      <div class="tut-card" id="tc-2">
+        <div class="tut-badge intermediate">Intermediate</div>
+        <div class="tut-thumb">
+          <div class="tut-play">▶</div>
+          <div class="tut-duration">12 min</div>
+          <div class="tut-emoji"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+        </div>
+        <div class="tut-info">
+          <h4>Extract Audio as MP3 / FLAC</h4>
+          <p>Convert any video to high-quality audio with embedded metadata.</p>
+          <div class="tut-tags"><span>MP3</span><span>FLAC</span><span>FFmpeg</span></div>
+        </div>
+      </div>
+
+      <div class="tut-card" id="tc-3">
+        <div class="tut-badge intermediate">Intermediate</div>
+        <div class="tut-thumb">
+          <div class="tut-play">▶</div>
+          <div class="tut-duration">15 min</div>
+          <div class="tut-emoji"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+        </div>
+        <div class="tut-info">
+          <h4>Downloading Full Playlists</h4>
+          <p>Archive entire channels and playlists with organised folder output.</p>
+          <div class="tut-tags"><span>Playlist</span><span>Channel</span></div>
+        </div>
+      </div>
+
+      <div class="tut-card" id="tc-4">
+        <div class="tut-badge advanced">Advanced</div>
+        <div class="tut-thumb">
+          <div class="tut-play">▶</div>
+          <div class="tut-duration">20 min</div>
+          <div class="tut-emoji"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+        </div>
+        <div class="tut-info">
+          <h4>Format Selection Mastery</h4>
+          <p>Master the -f flag: resolution, codecs, HDR, and quality selectors.</p>
+          <div class="tut-tags"><span>Formats</span><span>4K</span><span>HDR</span></div>
+        </div>
+      </div>
+
+      <div class="tut-card" id="tc-5">
+        <div class="tut-badge advanced">Advanced</div>
+        <div class="tut-thumb">
+          <div class="tut-play">▶</div>
+          <div class="tut-duration">25 min</div>
+          <div class="tut-emoji"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></div>
+        </div>
+        <div class="tut-info">
+          <h4>Automated Download Scripts</h4>
+          <p>Build a cron-based download bot with config files and post-processing.</p>
+          <div class="tut-tags"><span>Bash</span><span>Python</span><span>Automation</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     COMMAND GENERATOR
+══════════════════════════════════════ -->
+<section class="section bg-subtle" id="generator">
+  <div class="container">
+    <div class="sec-header">
+      <div class="sec-pill">Command Generator</div>
+      <h2 class="sec-title">Build Your <span class="glow-text">Command</span></h2>
+      <p class="sec-desc">No more guessing flags — paste a URL and get the perfect command instantly</p>
+    </div>
+
+    <div class="gen-wrap" id="gen-wrap">
+      <!-- Left: Controls -->
+      <div class="gen-controls" id="gen-controls">
+
+        <div class="gen-url-box" id="gen-url-box">
+          <svg class="gen-url-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          <input type="url" id="gen-url" class="gen-url-input" placeholder="Paste YouTube, Twitch, TikTok URL…" />
+          <button class="gen-url-clear" id="gen-url-clear">✕</button>
+        </div>
+
+        <div class="gen-row" id="gen-type-row">
+          <div class="gen-label">Download Type</div>
+          <div class="gen-pills">
+            <button class="gpill active" data-g="type" data-v="video"     id="gp-video">🎬 Video</button>
+            <button class="gpill"        data-g="type" data-v="audio"     id="gp-audio">🎵 Audio</button>
+            <button class="gpill"        data-g="type" data-v="thumbnail" id="gp-thumb">🖼 Thumb</button>
+            <button class="gpill"        data-g="type" data-v="subs"      id="gp-subs">💬 Subs</button>
+          </div>
+        </div>
+
+        <div class="gen-row" id="gen-quality-row">
+          <div class="gen-label">Quality</div>
+          <div class="gen-pills">
+            <button class="gpill active" data-g="quality" data-v="best" id="gp-best">⭐ Best</button>
+            <button class="gpill"        data-g="quality" data-v="2160" id="gp-4k">4K</button>
+            <button class="gpill"        data-g="quality" data-v="1080" id="gp-1080">1080p</button>
+            <button class="gpill"        data-g="quality" data-v="720"  id="gp-720">720p</button>
+            <button class="gpill"        data-g="quality" data-v="480"  id="gp-480">480p</button>
+            <button class="gpill"        data-g="quality" data-v="360"  id="gp-360">360p</button>
+          </div>
+        </div>
+
+        <div class="gen-row" id="gen-format-row">
+          <div class="gen-label">Format</div>
+          <div class="gen-pills">
+            <button class="gpill active" data-g="fmt" data-v="mp4"  id="gp-mp4">MP4</button>
+            <button class="gpill"        data-g="fmt" data-v="webm" id="gp-webm">WebM</button>
+            <button class="gpill"        data-g="fmt" data-v="mkv"  id="gp-mkv">MKV</button>
+            <button class="gpill"        data-g="fmt" data-v="mp3"  id="gp-mp3">MP3</button>
+            <button class="gpill"        data-g="fmt" data-v="flac" id="gp-flac">FLAC</button>
+            <button class="gpill"        data-g="fmt" data-v="opus" id="gp-opus">Opus</button>
+          </div>
+        </div>
+
+        <div class="gen-toggles" id="gen-toggles">
+          <label class="gtog" id="gt-subs">
+            <input type="checkbox" id="gt-subs-chk"/>
+            <span class="gtog-sw"></span>Embed subtitles
+          </label>
+          <label class="gtog" id="gt-thumb-l">
+            <input type="checkbox" id="gt-thumb-chk"/>
+            <span class="gtog-sw"></span>Embed thumbnail
+          </label>
+          <label class="gtog" id="gt-meta">
+            <input type="checkbox" id="gt-meta-chk" checked/>
+            <span class="gtog-sw"></span>Add metadata
+          </label>
+          <label class="gtog" id="gt-playlist">
+            <input type="checkbox" id="gt-playlist-chk"/>
+            <span class="gtog-sw"></span>Full playlist
+          </label>
+          <label class="gtog" id="gt-cookies">
+            <input type="checkbox" id="gt-cookies-chk"/>
+            <span class="gtog-sw"></span>Browser cookies
+          </label>
+          <label class="gtog" id="gt-sponsor">
+            <input type="checkbox" id="gt-sponsor-chk"/>
+            <span class="gtog-sw"></span>SponsorBlock
+          </label>
+        </div>
+      </div>
+
+      <!-- Right: Output -->
+      <div class="gen-output-wrap" id="gen-output-wrap">
+        <div class="gen-terminal">
+          <div class="gen-tbar">
+            <span class="td rd"></span><span class="td yd"></span><span class="td gd"></span>
+            <span class="tbar-title">terminal</span>
+            <button class="tbar-copy" id="tbar-copy">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="gen-tcode">
+            <span class="tprompt">$</span>
+            <code id="gen-cmd-output">yt-dlp -f "bestvideo+bestaudio" --merge-output-format mp4 --add-metadata &lt;URL&gt;</code>
+          </div>
+        </div>
+
+        <div class="gen-breakdown" id="gen-breakdown">
+          <h5>Command Breakdown</h5>
+          <div id="breakdown-list"></div>
+        </div>
+
+        <div class="gen-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          Run this in your terminal after installing yt-dlp. Only download content you have the right to download.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     QUICK COMMANDS
+══════════════════════════════════════ -->
+<section class="section" id="commands">
+  <div class="container">
+    <div class="sec-header">
+      <div class="sec-pill">Quick Reference</div>
+      <h2 class="sec-title">Ready-to-Use <span class="glow-text">Commands</span></h2>
+    </div>
+    <div class="cmd-grid" id="cmd-grid">
+
+      <div class="cmd-card" id="cc-0">
+        <div class="cmd-header"><span class="cmd-dot"></span>Best quality video</div>
+        <div class="cmd-body">
+          <code>yt-dlp -f "bestvideo+bestaudio" --merge-output-format mp4 URL</code>
+        </div>
+        <button class="cmd-copy" data-cmd='yt-dlp -f "bestvideo+bestaudio" --merge-output-format mp4 URL' id="cc-copy-0">Copy ↗</button>
+      </div>
+
+      <div class="cmd-card" id="cc-1">
+        <div class="cmd-header"><span class="cmd-dot"></span>Audio only MP3</div>
+        <div class="cmd-body">
+          <code>yt-dlp -x --audio-format mp3 --audio-quality 0 URL</code>
+        </div>
+        <button class="cmd-copy" data-cmd="yt-dlp -x --audio-format mp3 --audio-quality 0 URL" id="cc-copy-1">Copy ↗</button>
+      </div>
+
+      <div class="cmd-card" id="cc-2">
+        <div class="cmd-header"><span class="cmd-dot"></span>Playlist download</div>
+        <div class="cmd-body">
+          <code>yt-dlp --yes-playlist -o "%(playlist)s/%(title)s.%(ext)s" URL</code>
+        </div>
+        <button class="cmd-copy" data-cmd='yt-dlp --yes-playlist -o "%(playlist)s/%(title)s.%(ext)s" URL' id="cc-copy-2">Copy ↗</button>
+      </div>
+
+      <div class="cmd-card" id="cc-3">
+        <div class="cmd-header"><span class="cmd-dot"></span>4K + subtitles</div>
+        <div class="cmd-body">
+          <code>yt-dlp -f "bestvideo[height<=2160]+bestaudio" --embed-subs URL</code>
+        </div>
+        <button class="cmd-copy" data-cmd='yt-dlp -f "bestvideo[height<=2160]+bestaudio" --embed-subs URL' id="cc-copy-3">Copy ↗</button>
+      </div>
+
+      <div class="cmd-card" id="cc-4">
+        <div class="cmd-header"><span class="cmd-dot"></span>With browser cookies</div>
+        <div class="cmd-body">
+          <code>yt-dlp --cookies-from-browser chrome URL</code>
+        </div>
+        <button class="cmd-copy" data-cmd="yt-dlp --cookies-from-browser chrome URL" id="cc-copy-4">Copy ↗</button>
+      </div>
+
+      <div class="cmd-card" id="cc-5">
+        <div class="cmd-header"><span class="cmd-dot"></span>Self-update</div>
+        <div class="cmd-body">
+          <code>yt-dlp -U</code>
+        </div>
+        <button class="cmd-copy" data-cmd="yt-dlp -U" id="cc-copy-5">Copy ↗</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     CONTACT / SOCIALS
+══════════════════════════════════════ -->
+<section class="section bg-subtle" id="contact">
+  <div class="container">
+    <div class="sec-header">
+      <div class="sec-pill">Connect</div>
+      <h2 class="sec-title">Get in <span class="glow-text">Touch</span></h2>
+      <p class="sec-desc">Join the community, report issues, or just say hi!</p>
+    </div>
+
+    <div class="contact-grid" id="contact-grid">
+
+      <div class="social-card" id="sc-gh">
+        <div class="social-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        </div>
+        <div class="social-info">
+          <h4>GitHub</h4>
+          <p>Source code, issues, and releases</p>
+        </div>
+        <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" class="social-link" id="sl-gh">Visit →</a>
+      </div>
+
+      <div class="social-card" id="sc-dc">
+        <div class="social-icon" style="color:#5865f2">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+        </div>
+        <div class="social-info">
+          <h4>Discord</h4>
+          <p>Live chat with the community</p>
+        </div>
+        <a href="https://discord.gg/H5MNcFW63r" target="_blank" class="social-link" id="sl-dc">Join →</a>
+      </div>
+
+      <div class="social-card" id="sc-rd">
+        <div class="social-icon" style="color:#ff4500">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+        </div>
+        <div class="social-info">
+          <h4>Reddit</h4>
+          <p>Tips, tricks, and help from the community</p>
+        </div>
+        <a href="https://www.reddit.com/r/youtubedl/" target="_blank" class="social-link" id="sl-rd">Visit →</a>
+      </div>
+
+      <div class="social-card" id="sc-wiki">
+        <div class="social-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        </div>
+        <div class="social-info">
+          <h4>Documentation</h4>
+          <p>Full README with every flag explained</p>
+        </div>
+        <a href="https://github.com/yt-dlp/yt-dlp/blob/master/README.md" target="_blank" class="social-link" id="sl-wiki">Read →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer class="footer" id="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="brand">
+          <img src="avatar.png" alt="logo" class="brand-img" />
+          <span class="brand-name">YT-DLP<span class="brand-accent"> Hub</span></span>
+        </div>
+        <p>Your ultimate resource for yt-dlp — download anything, from anywhere, for free.</p>
+      </div>
+      <div class="footer-links">
+        <div class="fl-col">
+          <h5>Navigate</h5>
+          <a href="#about">About</a>
+          <a href="#tools">Tools</a>
+          <a href="#tutorials">Tutorials</a>
+          <a href="#generator">Generator</a>
+        </div>
+        <div class="fl-col">
+          <h5>Resources</h5>
+          <a href="https://github.com/yt-dlp/yt-dlp" target="_blank">GitHub</a>
+          <a href="https://github.com/yt-dlp/yt-dlp/releases" target="_blank">Releases</a>
+          <a href="https://github.com/yt-dlp/yt-dlp/wiki" target="_blank">Wiki</a>
+          <a href="https://discord.gg/H5MNcFW63r" target="_blank">Discord</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 YT-DLP Hub. Not affiliated with the official yt-dlp project.</span>
+      <span>Built with ❤️ for the open source community.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast">✓ Copied to clipboard!</div>
+
+<!-- Back to top -->
+<button class="back-top" id="back-top" aria-label="Back to top">↑</button>
+
+<script src="app.js"></script>
+</body>
+</html>
