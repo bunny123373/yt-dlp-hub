@@ -331,7 +331,69 @@ function attachHandlers(proc, job, jobId, opts) {
   });
 }
 
-// 2. SSE — subscribe to job progress
+// 2. Fetch video metadata (title, thumbnail, channel, duration)
+app.get('/api/info', (req, res) => {
+  const { url } = req.query;
+  if (!url || !url.startsWith('http')) {
+    return res.status(400).json({ error: 'Invalid URL' });
+  }
+
+  const baseArgs = ['--dump-json', '--no-playlist', '--no-warnings',
+                    '--socket-timeout', '20', url];
+  const allArgs  = [...YTDLP_ARGS, ...baseArgs];
+  const proc     = spawn(YTDLP_CMD, allArgs);
+
+  let output = '';
+  let errOut = '';
+  proc.stdout.on('data', c => { output += c.toString(); });
+  proc.stderr.on('data', c => { errOut += c.toString(); });
+
+  proc.on('error', err => {
+    if (err.code === 'ENOENT') {
+      // fallback python3
+      const p2 = spawn('python3', ['-m', 'yt_dlp', ...baseArgs]);
+      let o2 = '', e2 = '';
+      p2.stdout.on('data', c => { o2 += c.toString(); });
+      p2.stderr.on('data', c => { e2 += c.toString(); });
+      p2.on('close', code => {
+        if (code === 0) { sendInfo(res, o2); }
+        else { res.status(500).json({ error: e2.split('\n').pop() || 'Failed' }); }
+      });
+    } else {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  proc.on('close', code => {
+    if (code === 0) { sendInfo(res, output); }
+    else {
+      const msg = errOut.split('\n').filter(l => l.trim() && !l.includes('WARNING')).pop() || 'Could not fetch info';
+      res.status(500).json({ error: msg.replace(/^ERROR:\s*/i, '') });
+    }
+  });
+});
+
+function sendInfo(res, rawJson) {
+  try {
+    const d = JSON.parse(rawJson.trim().split('\n')[0]); // first JSON line
+    res.json({
+      title:       d.title        || 'Unknown Title',
+      uploader:    d.uploader     || d.channel || d.creator || '',
+      duration:    d.duration     || 0,
+      thumbnail:   d.thumbnail    || '',
+      view_count:  d.view_count   || 0,
+      like_count:  d.like_count   || 0,
+      upload_date: d.upload_date  || '',
+      extractor:   d.extractor_key || d.ie_key || '',
+      webpage_url: d.webpage_url  || '',
+      description: (d.description || '').slice(0, 200),
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to parse metadata' });
+  }
+}
+
+// 3. SSE — subscribe to job progress
 app.get('/api/progress/:jobId', (req, res) => {
   const { jobId } = req.params;
   const job = jobs.get(jobId);

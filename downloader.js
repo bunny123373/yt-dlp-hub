@@ -12,8 +12,11 @@
 const API = window.BACKEND_URL || 'http://localhost:3001';
 
 // ── State ─────────────────────────────────────
-let currentJobId = null;
-let currentSSE   = null;
+let currentJobId  = null;
+let currentSSE    = null;
+let currentInfo   = null;   // fetched video metadata
+let infoCtr       = 0;      // cancel stale requests
+let infoDebounce  = null;
 let opts = {
   type: 'video', quality: 'best', fmt: 'mp4',
   subs: false, thumb: false, meta: true,
@@ -97,6 +100,13 @@ urlInput.addEventListener('input', () => {
   } else {
     urlDetect.style.display = 'none';
   }
+  // Debounce info fetch
+  clearTimeout(infoDebounce);
+  if (val.startsWith('http')) {
+    infoDebounce = setTimeout(() => fetchVideoInfo(val), 600);
+  } else {
+    hidePreview();
+  }
 });
 
 $('url-paste-btn').addEventListener('click', async () => {
@@ -113,6 +123,98 @@ $('url-clear-btn').addEventListener('click', () => {
   urlInput.value = '';
   urlInput.dispatchEvent(new Event('input'));
   urlDetect.style.display = 'none';
+  hidePreview();
+  currentInfo = null;
+});
+
+// ── Video Info Fetch ──────────────────────────
+function fmtDuration(secs) {
+  if (!secs) return '';
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function fmtViews(n) {
+  if (!n) return '';
+  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B views';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M views';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K views';
+  return n + ' views';
+}
+
+function fmtDate(d) {
+  if (!d || d.length < 8) return '';
+  return d.slice(0,4) + '-' + d.slice(4,6) + '-' + d.slice(6,8);
+}
+
+async function fetchVideoInfo(url) {
+  const ctr = ++infoCtr;
+  showPreviewLoading();
+  try {
+    const res  = await fetch(`${API}/api/info?url=${encodeURIComponent(url)}`);
+    if (ctr !== infoCtr) return; // stale
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed' }));
+      showPreviewError(err.error);
+      return;
+    }
+    const info = await res.json();
+    if (ctr !== infoCtr) return;
+    currentInfo = info;
+    showPreviewCard(info);
+  } catch (e) {
+    if (ctr !== infoCtr) return;
+    showPreviewError('Network error — is the server awake?');
+  }
+}
+
+function showPreviewLoading() {
+  const vp = $('video-preview');
+  vp.style.display   = 'block';
+  $('vp-loading').style.display = 'flex';
+  $('vp-card').style.display    = 'none';
+  $('vp-error').style.display   = 'none';
+}
+
+function showPreviewCard(info) {
+  const vp = $('video-preview');
+  vp.style.display   = 'block';
+  $('vp-loading').style.display = 'none';
+  $('vp-error').style.display   = 'none';
+  $('vp-card').style.display    = 'flex';
+
+  $('vp-thumb').src        = info.thumbnail || '';
+  $('vp-thumb').style.display = info.thumbnail ? 'block' : 'none';
+  $('vp-dur').textContent  = fmtDuration(info.duration);
+  $('vp-platform').textContent = info.extractor || detectPlatform(urlInput.value.trim()) || 'Web';
+  $('vp-title-card').textContent  = info.title;
+  $('vp-channel').textContent     = info.uploader ? '@ ' + info.uploader : '';
+  $('vp-views').textContent       = fmtViews(info.view_count);
+  $('vp-date').textContent        = fmtDate(info.upload_date);
+}
+
+function showPreviewError(msg) {
+  const vp = $('video-preview');
+  vp.style.display   = 'block';
+  $('vp-loading').style.display = 'none';
+  $('vp-card').style.display    = 'none';
+  $('vp-error').style.display   = 'flex';
+  $('vp-error-msg').textContent = msg || 'Could not fetch video info';
+}
+
+function hidePreview() {
+  $('video-preview').style.display = 'none';
+  $('vp-card').style.display = 'none';
+}
+
+$('vp-clear').addEventListener('click', () => {
+  hidePreview();
+  currentInfo = null;
+  urlInput.value = '';
+  urlInput.dispatchEvent(new Event('input'));
 });
 
 // ── Pill options ──────────────────────────────
@@ -238,7 +340,8 @@ function handleEvent(data) {
     case 'hello':
     case 'status':
       if (data.status === 'downloading') {
-        setStatus('⚡', 'Downloading…');
+        const zapSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+        setStatus(zapSvg, currentInfo ? currentInfo.title : 'Downloading…');
         addLog('Download started', 'info');
       }
       break;
@@ -280,9 +383,20 @@ function handleEvent(data) {
 function showProgressPanel() {
   progressPanel.style.display = 'flex';
   progressPanel.style.flexDirection = 'column';
-  $('pp-title').textContent    = 'Starting download…';
-  $('pp-filename').textContent = 'Fetching metadata…';
-  $('pp-icon').textContent     = '⏳';
+  const title = currentInfo ? currentInfo.title : 'Downloading…';
+  $('pp-title').textContent    = title;
+  $('pp-filename').textContent = 'Starting up…';
+  // Clock SVG icon
+  $('pp-icon').innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+  // Show video thumbnail strip if we have info
+  if (currentInfo && currentInfo.thumbnail) {
+    $('ppv-thumb').src = currentInfo.thumbnail;
+    $('ppv-title').textContent   = currentInfo.title || '';
+    $('ppv-channel').textContent = currentInfo.uploader ? '@ ' + currentInfo.uploader : '';
+    $('pp-video-info').style.display = 'flex';
+  } else {
+    $('pp-video-info').style.display = 'none';
+  }
   setProgress(0);
   $('sv-speed').textContent = '—';
   $('sv-eta').textContent   = '—';
@@ -291,11 +405,15 @@ function showProgressPanel() {
   $('log-body').innerHTML   = '';
   dlBtn.classList.remove('loading');
   dlBtnText.textContent = 'Downloading…';
+  hidePreview();
 }
 
-function setStatus(icon, title) {
-  $('pp-icon').textContent  = icon;
-  $('pp-title').textContent = title;
+function setStatus(iconSvg, title) {
+  $('pp-icon').innerHTML  = iconSvg;
+  // Only update title if not already showing real video title
+  if (!currentInfo || !currentInfo.title) {
+    $('pp-title').textContent = title;
+  }
 }
 
 function setProgress(pct) {
@@ -311,7 +429,9 @@ function setProgress(pct) {
 function updateProgress(data) {
   setProgress(data.progress || 0);
   if (data.progress > 0) {
-    setStatus('⬇️', `Downloading… ${Math.round(data.progress)}%`);
+    const dlSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+    setStatus(dlSvg, currentInfo ? currentInfo.title : `Downloading… ${Math.round(data.progress)}%`);
+    if (!currentInfo) $('pp-filename').textContent = `${Math.round(data.progress)}% complete`;
   }
   if (data.speed)      $('sv-speed').textContent = data.speed;
   if (data.eta)        $('sv-eta').textContent   = data.eta;
