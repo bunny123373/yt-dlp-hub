@@ -83,13 +83,12 @@ function buildYtdlpArgs(opts) {
   } else if (type === 'subs') {
     args.push('--write-subs', '--write-auto-subs', '--skip-download', '--sub-format', 'srt/best');
   } else {
-    // video — robust fallback chain that works with iOS/HLS and DASH
+    // video — works with both DASH (web) and progressive (iOS/HLS)
     let fmtStr;
     if (quality === 'best') {
-      fmtStr = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best';
+      fmtStr = 'bestvideo+bestaudio/best';
     } else {
       fmtStr = [
-        `bestvideo[height<=${quality}][ext=mp4]+bestaudio[ext=m4a]`,
         `bestvideo[height<=${quality}]+bestaudio`,
         `best[height<=${quality}]`,
         'bestvideo+bestaudio',
