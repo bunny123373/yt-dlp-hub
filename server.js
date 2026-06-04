@@ -291,6 +291,10 @@ function runDownload(jobId, opts) {
                      || errLines.pop()
                      || `yt-dlp exited with code ${code}`;
       job.error  = lastError.replace(/^ERROR:\s*/i, '');
+      // Replace raw YouTube bot error with friendly message
+      if (job.error.includes('Sign in to confirm') || job.error.includes('not a bot')) {
+        job.error = 'YouTube is restricting this video. Try a different video URL, or use a direct link.';
+      }
       broadcastToJob(jobId, { type: 'error', message: job.error });
       cleanupJob(jobId, 5000);
     }
