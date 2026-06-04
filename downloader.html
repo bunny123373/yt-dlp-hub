@@ -67,38 +67,6 @@
     </div>
   </div>
 
-  <!-- ── Video Preview Card ── -->
-  <div class="video-preview" id="video-preview" style="display:none">
-    <!-- Loading state -->
-    <div class="vp-loading" id="vp-loading">
-      <div class="vp-spinner"></div>
-      <span>Fetching video info…</span>
-    </div>
-    <!-- Info state -->
-    <div class="vp-card" id="vp-card" style="display:none">
-      <div class="vp-thumb-wrap">
-        <img class="vp-thumb" id="vp-thumb" src="" alt="thumbnail" />
-        <span class="vp-dur" id="vp-dur"></span>
-      </div>
-      <div class="vp-details">
-        <div class="vp-platform" id="vp-platform"></div>
-        <div class="vp-title" id="vp-title-card"></div>
-        <div class="vp-channel" id="vp-channel"></div>
-        <div class="vp-meta-row">
-          <span class="vp-views" id="vp-views"></span>
-          <span class="vp-date" id="vp-date"></span>
-        </div>
-      </div>
-      <button class="vp-clear" id="vp-clear" title="Clear">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <!-- Error state -->
-    <div class="vp-error" id="vp-error" style="display:none">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span id="vp-error-msg">Could not fetch video info</span>
-    </div>
-  </div>
 
   <!-- ── Options ── -->
   <div class="opts-panel" id="opts-panel">
@@ -172,22 +140,12 @@
 
     <div class="pp-header">
       <div class="pp-status-row">
-        <div class="pp-status-icon" id="pp-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
+        <div class="pp-status-icon" id="pp-icon">⏳</div>
         <div class="pp-status-text">
           <div class="pp-title" id="pp-title">Starting download…</div>
           <div class="pp-filename" id="pp-filename">Fetching metadata…</div>
         </div>
         <button class="pp-cancel" id="pp-cancel">Cancel</button>
-      </div>
-      <!-- Video preview inside progress -->
-      <div class="pp-video-info" id="pp-video-info" style="display:none">
-        <img class="ppv-thumb" id="ppv-thumb" src="" alt="" />
-        <div class="ppv-details">
-          <div class="ppv-title" id="ppv-title"></div>
-          <div class="ppv-channel" id="ppv-channel"></div>
-        </div>
       </div>
     </div>
 
