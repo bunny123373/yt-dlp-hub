@@ -12,13 +12,14 @@ const path       = require('path');
 const fs         = require('fs');
 const { spawn }  = require('child_process');
 const { v4: uuid } = require('uuid');
+const ytDlp      = require('yt-dlp-exec');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
-// ── yt-dlp command (fallback to python3 -m yt_dlp on cloud) ─
-const YTDLP_CMD  = process.env.YTDLP_CMD || 'yt-dlp';
-const YTDLP_ARGS = YTDLP_CMD.includes('python') ? ['-m', 'yt_dlp'] : [];
+// ── yt-dlp binary (from yt-dlp-exec, auto-downloaded on npm install) ─
+const YTDLP_CMD  = process.env.YTDLP_CMD || ytDlp.path || 'yt-dlp';
+const YTDLP_ARGS = [];
 
 // ── Directories ─────────────────────────────
 const DOWNLOADS_DIR = path.join(__dirname, 'downloads');
@@ -381,46 +382,37 @@ app.delete('/api/cookies', (req, res) => {
   res.json({ ok: true });
 });
 
-// 3. Fetch video metadata (title, thumbnail, channel, duration)
-app.get('/api/info', (req, res) => {
+// 3. Fetch video metadata using yt-dlp-exec
+app.get('/api/info', async (req, res) => {
   const { url } = req.query;
   if (!url || !url.startsWith('http')) {
     return res.status(400).json({ error: 'Invalid URL' });
   }
-
-  const baseArgs = ['--dump-json', '--no-playlist', '--no-warnings',
-                    '--socket-timeout', '20', url];
-  const allArgs  = [...YTDLP_ARGS, ...baseArgs];
-  const proc     = spawn(YTDLP_CMD, allArgs);
-
-  let output = '';
-  let errOut = '';
-  proc.stdout.on('data', c => { output += c.toString(); });
-  proc.stderr.on('data', c => { errOut += c.toString(); });
-
-  proc.on('error', err => {
-    if (err.code === 'ENOENT') {
-      // fallback python3
-      const p2 = spawn('python3', ['-m', 'yt_dlp', ...baseArgs]);
-      let o2 = '', e2 = '';
-      p2.stdout.on('data', c => { o2 += c.toString(); });
-      p2.stderr.on('data', c => { e2 += c.toString(); });
-      p2.on('close', code => {
-        if (code === 0) { sendInfo(res, o2); }
-        else { res.status(500).json({ error: e2.split('\n').pop() || 'Failed' }); }
-      });
-    } else {
-      res.status(500).json({ error: err.message });
-    }
-  });
-
-  proc.on('close', code => {
-    if (code === 0) { sendInfo(res, output); }
-    else {
-      const msg = errOut.split('\n').filter(l => l.trim() && !l.includes('WARNING')).pop() || 'Could not fetch info';
-      res.status(500).json({ error: msg.replace(/^ERROR:\s*/i, '') });
-    }
-  });
+  try {
+    const extraArgs = {};
+    if (fs.existsSync(COOKIES_FILE)) extraArgs.cookies = COOKIES_FILE;
+    const info = await ytDlp(url, {
+      dumpSingleJson:    true,
+      noPlaylist:        true,
+      noWarnings:        true,
+      socketTimeout:     20,
+      extractorArgs:     'youtube:player_client=tv_embedded,ios,web',
+      ...extraArgs,
+    });
+    res.json({
+      title:       info.title        || 'Unknown Title',
+      thumbnail:   info.thumbnail    || null,
+      uploader:    info.uploader     || info.channel || null,
+      duration:    info.duration     || null,
+      view_count:  info.view_count   || null,
+      upload_date: info.upload_date  || null,
+      extractor:   info.extractor    || null,
+    });
+  } catch (e) {
+    const msg = (e.stderr || e.message || 'Could not fetch info').split('\n')
+      .filter(l => l.trim() && !l.includes('WARNING')).pop() || 'Could not fetch info';
+    res.status(500).json({ error: msg.replace(/^ERROR:\s*/i, '') });
+  }
 });
 
 function sendInfo(res, rawJson) {
