@@ -14,6 +14,7 @@ const API = window.BACKEND_URL || 'http://localhost:3001';
 // ── State ─────────────────────────────────────
 let currentJobId  = null;
 let currentSSE    = null;
+let currentTitle  = '';     // real video title from /api/info
 let opts = {
   type: 'video', quality: 'best', fmt: 'mp4',
   subs: false, thumb: false, meta: true,
@@ -151,21 +152,30 @@ async function startDownload() {
   const url = urlInput.value.trim();
   if (!url) return;
 
-  // Check server first
   const online = await checkServer();
   if (!online) {
     showError('Server not running', 'Please start the backend server first:\n\nnode server.js\n\nThen try again.');
     return;
   }
 
-  // UI: loading state
+  currentTitle = '';
   dlBtn.disabled = true;
   dlBtn.classList.add('loading');
   dlBtnText.textContent = 'Starting…';
-
-  // Hide other panels
   donePanel.style.display  = 'none';
   errorPanel.style.display = 'none';
+
+  // Fetch title in background (non-blocking)
+  fetch(`${API}/api/info?url=${encodeURIComponent(url)}`)
+    .then(r => r.ok ? r.json() : null)
+    .then(info => {
+      if (info && info.title) {
+        currentTitle = info.title;
+        $('pp-title').textContent = info.title;
+        $('pp-filename').textContent = info.uploader ? '@ ' + info.uploader : '';
+      }
+    })
+    .catch(() => {});
 
   try {
     const res = await fetch(`${API}/api/download`, {
@@ -181,8 +191,6 @@ async function startDownload() {
 
     const { jobId } = await res.json();
     currentJobId = jobId;
-
-    // Show progress panel
     showProgressPanel();
     subscribeToProgress(jobId);
 
@@ -280,7 +288,7 @@ function handleEvent(data) {
 function showProgressPanel() {
   progressPanel.style.display = 'flex';
   progressPanel.style.flexDirection = 'column';
-  $('pp-title').textContent    = 'Starting download…';
+  $('pp-title').textContent    = currentTitle || 'Starting download…';
   $('pp-filename').textContent = 'Fetching metadata…';
   $('pp-icon').textContent     = '⏳';
   setProgress(0);
@@ -294,8 +302,8 @@ function showProgressPanel() {
 }
 
 function setStatus(icon, title) {
-  $('pp-icon').textContent  = icon;
-  $('pp-title').textContent = title;
+  $('pp-icon').textContent = icon;
+  if (!currentTitle) $('pp-title').textContent = title;
 }
 
 function setProgress(pct) {
@@ -311,7 +319,8 @@ function setProgress(pct) {
 function updateProgress(data) {
   setProgress(data.progress || 0);
   if (data.progress > 0) {
-    setStatus('⬇️', `Downloading… ${Math.round(data.progress)}%`);
+    $('pp-icon').textContent = '⬇️';
+    if (!currentTitle) $('pp-title').textContent = `Downloading… ${Math.round(data.progress)}%`;
   }
   if (data.speed)      $('sv-speed').textContent = data.speed;
   if (data.eta)        $('sv-eta').textContent   = data.eta;
