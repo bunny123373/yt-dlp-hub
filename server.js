@@ -115,7 +115,7 @@ function buildYtdlpArgs(opts) {
   if (thumb && type !== 'thumbnail') { args.push('--embed-thumbnail'); }
   if (meta)                      { args.push('--add-metadata'); }
   if (playlist)                  { args.push('--yes-playlist'); delete args[args.indexOf('--no-playlist')]; }
-  if (cookies)                   { args.push('--cookies-from-browser', 'chrome'); }
+  // Note: --cookies-from-browser not used (no browser on server); cookies.txt handled separately below
   if (sponsor)                   { args.push('--sponsorblock-mark', 'all'); }
 
   // YouTube: use TV/Android clients — bypass bot detection without cookies
