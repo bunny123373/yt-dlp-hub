@@ -16,6 +16,10 @@ const { v4: uuid } = require('uuid');
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
+// ── yt-dlp command (fallback to python3 -m yt_dlp on cloud) ─
+const YTDLP_CMD  = process.env.YTDLP_CMD || 'yt-dlp';
+const YTDLP_ARGS = YTDLP_CMD.includes('python') ? ['-m', 'yt_dlp'] : [];
+
 // ── Directories ─────────────────────────────
 const DOWNLOADS_DIR = path.join(__dirname, 'downloads');
 const PUBLIC_DIR    = path.join(__dirname, '.');
@@ -97,6 +101,8 @@ function buildYtdlpArgs(opts) {
   if (cookies)                   { args.push('--cookies-from-browser', 'chrome'); }
   if (sponsor)                   { args.push('--sponsorblock-mark', 'all'); }
 
+  args.push('--socket-timeout', '30');
+  args.push('--retries', '3');
   args.push('--no-warnings');
   args.push(url);
 
@@ -135,10 +141,11 @@ function runDownload(jobId, opts) {
   job.status = 'downloading';
   broadcastToJob(jobId, { type: 'status', status: 'downloading' });
 
-  const args = buildYtdlpArgs({ ...opts, jobId });
-  console.log(`[${jobId}] yt-dlp ${args.join(' ')}`);
+  const extraArgs = buildYtdlpArgs({ ...opts, jobId });
+  const allArgs   = [...YTDLP_ARGS, ...extraArgs];
+  console.log(`[${jobId}] ${YTDLP_CMD} ${allArgs.join(' ')}`);
 
-  const proc = spawn('yt-dlp', args, { cwd: DOWNLOADS_DIR });
+  const proc = spawn(YTDLP_CMD, allArgs, { cwd: DOWNLOADS_DIR });
   job.proc = proc;
 
   proc.stdout.on('data', chunk => {
@@ -183,14 +190,32 @@ function runDownload(jobId, opts) {
     }
   });
 
+  let stderrBuf = '';
   proc.stderr.on('data', chunk => {
     const line = chunk.toString().trim();
+    stderrBuf += line + '\n';
     if (line) {
       console.error(`[${jobId}] ERR: ${line}`);
-      // Broadcast non-fatal warnings as info
-      if (!line.includes('WARNING')) {
+      if (!line.includes('WARNING') && !line.includes('Merging')) {
         broadcastToJob(jobId, { type: 'log', message: line });
       }
+    }
+  });
+
+  proc.on('error', err => {
+    // If yt-dlp not found, retry with python3 -m yt_dlp
+    if (err.code === 'ENOENT' && YTDLP_CMD === 'yt-dlp') {
+      console.log(`[${jobId}] yt-dlp not found, retrying with python3 -m yt_dlp`);
+      broadcastToJob(jobId, { type: 'log', message: 'Retrying with python3...' });
+      const extraArgs = buildYtdlpArgs({ ...opts, jobId });
+      const proc2 = spawn('python3', ['-m', 'yt_dlp', ...extraArgs], { cwd: DOWNLOADS_DIR });
+      job.proc = proc2;
+      attachHandlers(proc2, job, jobId, opts);
+    } else {
+      job.status = 'error';
+      job.error  = `Failed to start yt-dlp: ${err.message}. Is yt-dlp installed?`;
+      broadcastToJob(jobId, { type: 'error', message: job.error });
+      cleanupJob(jobId, 5000);
     }
   });
 
@@ -231,17 +256,68 @@ function runDownload(jobId, opts) {
       }
     } else {
       job.status = 'error';
-      job.error  = `yt-dlp exited with code ${code}`;
+      // Extract meaningful error from stderr buffer
+      const errLines  = stderrBuf.split('\n').filter(l => l.trim() && !l.includes('WARNING'));
+      const lastError = errLines.filter(l => l.toLowerCase().includes('error') || l.includes('ERROR')).pop()
+                     || errLines.pop()
+                     || `yt-dlp exited with code ${code}`;
+      job.error  = lastError.replace(/^ERROR:\s*/i, '');
       broadcastToJob(jobId, { type: 'error', message: job.error });
       cleanupJob(jobId, 5000);
     }
   });
+}
 
+function attachHandlers(proc, job, jobId, opts) {
+  // Re-attach stdout/stderr handlers for retry proc
+  proc.stdout.on('data', chunk => {
+    const lines = chunk.toString().split('\n');
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+      if (line.includes('%')) {
+        const parts = line.split('|');
+        if (parts.length >= 2) {
+          const pct = parseFloat(parts[0].replace('%', '').trim());
+          if (!isNaN(pct)) {
+            job.progress = pct; job.speed = (parts[1]||'').trim();
+            job.eta = (parts[2]||'').trim(); job.downloaded = (parts[3]||'').trim(); job.total = (parts[4]||'').trim();
+            broadcastToJob(jobId, { type:'progress', progress:pct, speed:job.speed, eta:job.eta, downloaded:job.downloaded, total:job.total });
+          }
+        }
+      } else if (line.startsWith('[download] Destination:')) {
+        const fp = line.replace('[download] Destination:', '').trim();
+        job.filepath = fp; job.filename = path.basename(fp);
+        broadcastToJob(jobId, { type: 'filename', filename: job.filename });
+      }
+    }
+  });
+  proc.stderr.on('data', chunk => { console.error(`[retry] ${chunk.toString().trim()}`); });
   proc.on('error', err => {
-    job.status = 'error';
-    job.error  = `Failed to start yt-dlp: ${err.message}. Make sure yt-dlp is installed.`;
-    broadcastToJob(jobId, { type: 'error', message: job.error });
-    cleanupJob(jobId, 5000);
+    job.status = 'error'; job.error = err.message;
+    broadcastToJob(jobId, { type: 'error', message: err.message }); cleanupJob(jobId, 5000);
+  });
+  proc.on('close', code => {
+    if (code === 0) {
+      let finalFile = job.filepath;
+      if (!finalFile || !fs.existsSync(finalFile)) {
+        const files = fs.readdirSync(DOWNLOADS_DIR).filter(f => f.startsWith(jobId));
+        if (files.length > 0) {
+          finalFile = path.join(DOWNLOADS_DIR, files.sort((a,b) => fs.statSync(path.join(DOWNLOADS_DIR,b)).size - fs.statSync(path.join(DOWNLOADS_DIR,a)).size)[0]);
+        }
+      }
+      if (finalFile && fs.existsSync(finalFile)) {
+        job.status = 'done'; job.filepath = finalFile; job.filename = path.basename(finalFile); job.progress = 100;
+        broadcastToJob(jobId, { type:'done', filename:job.filename, filesize:formatBytes(fs.statSync(finalFile).size), url:`/api/file/${jobId}/${encodeURIComponent(job.filename)}` });
+        cleanupJob(jobId, 10 * 60 * 1000);
+      } else {
+        job.status='error'; job.error='Output file not found';
+        broadcastToJob(jobId, { type:'error', message:job.error }); cleanupJob(jobId, 5000);
+      }
+    } else {
+      job.status='error'; job.error=`yt-dlp exited with code ${code}`;
+      broadcastToJob(jobId, { type:'error', message:job.error }); cleanupJob(jobId, 5000);
+    }
   });
 }
 

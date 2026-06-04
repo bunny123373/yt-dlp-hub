@@ -6,7 +6,10 @@
 
 'use strict';
 
-const API = 'http://localhost:3001';
+// ── Backend URL ────────────────────────────────
+// Set window.BACKEND_URL in a <script> before this file to override.
+// e.g. <script>window.BACKEND_URL = 'https://yt-dlp-hub.onrender.com';</script>
+const API = window.BACKEND_URL || 'http://localhost:3001';
 
 // ── State ─────────────────────────────────────
 let currentJobId = null;

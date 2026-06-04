@@ -1,12 +1,10 @@
 services:
   - type: web
-    name: yt-dlp-hub-backend
-    env: node
-    region: oregon
+    name: yt-dlp-hub
+    env: docker
+    region: singapore
     plan: free
-    buildCommand: npm install && pip install yt-dlp
-    startCommand: node server.js
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: NODE_ENV
         value: production
-    healthCheckPath: /api/status/ping
