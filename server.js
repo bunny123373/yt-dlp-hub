@@ -23,8 +23,19 @@ const YTDLP_ARGS = YTDLP_CMD.includes('python') ? ['-m', 'yt_dlp'] : [];
 // ── Directories ─────────────────────────────
 const DOWNLOADS_DIR = path.join(__dirname, 'downloads');
 const PUBLIC_DIR    = path.join(__dirname, '.');
-const COOKIES_FILE  = path.join(__dirname, 'yt-cookies.txt'); // optional user-supplied cookies
+const COOKIES_FILE  = path.join(__dirname, 'yt-cookies.txt');
 if (!fs.existsSync(DOWNLOADS_DIR)) fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
+
+// ── Restore cookies from env var (survives restarts) ─
+if (process.env.YT_COOKIES_B64 && !fs.existsSync(COOKIES_FILE)) {
+  try {
+    const decoded = Buffer.from(process.env.YT_COOKIES_B64, 'base64').toString('utf8');
+    fs.writeFileSync(COOKIES_FILE, decoded, 'utf8');
+    console.log('  ✓ YouTube cookies restored from environment variable');
+  } catch (e) {
+    console.error('  ✗ Failed to restore cookies from env:', e.message);
+  }
+}
 
 // ── In-memory job store ─────────────────────
 // { [jobId]: { status, progress, speed, eta, filename, filepath, error, clients:Set } }
