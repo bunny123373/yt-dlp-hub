@@ -140,6 +140,9 @@ function buildYtdlpArgs(opts) {
 
 // ── Routes ───────────────────────────────────
 
+// 0. Health check
+app.get('/api/health', (req, res) => res.json({ ok: true, version: '1.0' }));
+
 // 1. Start a download job
 app.post('/api/download', (req, res) => {
   const { url, type = 'video', quality = 'best', fmt = 'mp4',

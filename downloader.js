@@ -42,8 +42,8 @@ async function checkServer() {
   const dot   = $('si-dot');
   const label = $('si-label');
   try {
-    const r = await fetch(`${API}/api/status/test`, { signal: AbortSignal.timeout(3000) }).catch(() => null);
-    // Any response (even 404) means server is up
+    const r = await fetch(`${API}/api/health`, { signal: AbortSignal.timeout(3000) }).catch(() => null);
+    if (!r) throw new Error('No response');
     dot.className = 'si-dot online';
     label.textContent = 'Server Online';
     return true;
