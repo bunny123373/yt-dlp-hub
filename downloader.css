@@ -402,6 +402,93 @@ button { font-family: var(--font); }
 .sc-more { color: var(--cyan); border-color: rgba(0,245,255,0.2); }
 .sites-note { font-size: 0.78rem; color: var(--txt3); }
 
+/* ── COOKIE AUTH PANEL ── */
+.cookie-panel {
+  background: var(--card); border: 1px solid rgba(191,90,242,0.2); border-radius: var(--r);
+  overflow: hidden; position: relative;
+}
+.cp-header {
+  display: flex; align-items: center; gap: 12px; padding: 16px 20px;
+  border-bottom: 1px solid transparent; transition: border-color var(--t);
+}
+.cp-header.open { border-color: var(--border); }
+.cp-icon {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(191,90,242,0.1); border: 1px solid rgba(191,90,242,0.2);
+  color: var(--violet); display: flex; align-items: center; justify-content: center;
+}
+.cp-title-group { flex: 1; min-width: 0; }
+.cp-title { font-weight: 700; font-size: 0.9rem; }
+.cp-sub { font-size: 0.78rem; color: var(--txt3); margin-top: 2px; }
+.cp-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.78rem; color: var(--txt2); flex-shrink: 0;
+}
+.cp-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--txt3);
+  transition: all 0.3s;
+}
+.cp-dot.has-cookies { background: var(--green); box-shadow: 0 0 6px var(--green); animation: blink 2s infinite; }
+.cp-dot.no-cookies  { background: var(--gold); }
+.cp-toggle {
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(191,90,242,0.08); border: 1px solid rgba(191,90,242,0.2);
+  color: var(--violet); font-size: 0.78rem; font-weight: 600;
+  padding: 5px 12px; border-radius: 6px; cursor: pointer; transition: all var(--t);
+}
+.cp-toggle:hover { background: rgba(191,90,242,0.15); }
+.cp-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+.cp-steps { display: flex; flex-direction: column; gap: 10px; }
+.cp-step {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 0.85rem; color: var(--txt2); line-height: 1.5;
+}
+.cp-step-num {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(191,90,242,0.15); border: 1px solid rgba(191,90,242,0.3);
+  color: var(--violet); font-size: 0.72rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.cp-link {
+  color: var(--cyan); text-decoration: underline; text-underline-offset: 2px;
+  font-size: 0.82rem;
+}
+.cp-upload-area {
+  border: 2px dashed rgba(191,90,242,0.25); border-radius: 10px;
+  padding: 24px; text-align: center; color: var(--txt3);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  transition: all var(--t); cursor: pointer;
+}
+.cp-upload-area:hover, .cp-upload-area.drag-over {
+  border-color: var(--violet); color: var(--violet);
+  background: rgba(191,90,242,0.05);
+}
+.cp-upload-text { font-size: 0.875rem; }
+.cp-upload-hint { font-size: 0.75rem; color: var(--txt3); }
+.cp-browse-btn {
+  background: rgba(191,90,242,0.1); border: 1px solid rgba(191,90,242,0.3);
+  color: var(--violet); padding: 3px 10px; border-radius: 5px; font-size: 0.82rem;
+  cursor: pointer; font-family: var(--font); font-weight: 600; transition: all var(--t);
+}
+.cp-browse-btn:hover { background: rgba(191,90,242,0.2); }
+.cp-actions { display: flex; gap: 10px; }
+.cp-clear-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 7px;
+  background: rgba(255,55,95,0.08); border: 1px solid rgba(255,55,95,0.2);
+  color: var(--pink); font-size: 0.82rem; cursor: pointer; font-family: var(--font);
+  transition: all var(--t);
+}
+.cp-clear-btn:hover { background: rgba(255,55,95,0.15); }
+.cp-feedback {
+  padding: 10px 14px; border-radius: 8px; font-size: 0.83rem;
+  border: 1px solid var(--border);
+}
+.cp-feedback.ok  { background: rgba(48,209,88,0.08); border-color: rgba(48,209,88,0.25); color: var(--green); }
+.cp-feedback.err { background: rgba(255,55,95,0.08); border-color: rgba(255,55,95,0.25); color: var(--pink); }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 640px) {
   .opts-grid { grid-template-columns: 1fr; }

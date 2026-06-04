@@ -509,10 +509,99 @@ $('err-retry-btn').addEventListener('click', () => {
   resetBtn();
 });
 
-// Log toggle
-let logVisible = true;
-$('log-toggle').addEventListener('click', () => {
-  logVisible = !logVisible;
-  $('log-body').style.display = logVisible ? 'block' : 'none';
-  $('log-toggle').textContent = logVisible ? 'Hide ▲' : 'Show ▼';
-});
+// ── Cookie Auth Panel ─────────────────────────
+(async function initCookiePanel() {
+  const dot        = $('cp-dot');
+  const statusText = $('cp-status-text');
+  const body       = $('cp-body');
+  const toggle     = $('cp-toggle');
+  const header     = $('cp-header');
+  const feedback   = $('cp-feedback');
+  const fileInput  = $('cp-file-input');
+  const uploadArea = $('cp-upload-area');
+  let open = false;
+
+  async function checkCookies() {
+    try {
+      const r = await fetch(`${API}/api/cookies/status`);
+      const d = await r.json();
+      if (d.hasCookies) {
+        dot.className = 'cp-dot has-cookies';
+        statusText.textContent = '✓ Cookies active';
+      } else {
+        dot.className = 'cp-dot no-cookies';
+        statusText.textContent = 'No cookies';
+      }
+    } catch (_) {
+      dot.className = 'cp-dot';
+      statusText.textContent = 'Server offline';
+    }
+  }
+  checkCookies();
+
+  toggle.addEventListener('click', () => {
+    open = !open;
+    body.style.display = open ? 'flex' : 'none';
+    header.classList.toggle('open', open);
+    toggle.querySelector('svg').style.transform = open ? 'rotate(180deg)' : '';
+  });
+
+  function showFeedback(msg, type) {
+    feedback.textContent = msg;
+    feedback.className = 'cp-feedback ' + type;
+    feedback.style.display = 'block';
+    setTimeout(() => { feedback.style.display = 'none'; }, 4000);
+  }
+
+  async function uploadCookies(text) {
+    try {
+      const r = await fetch(`${API}/api/cookies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: text
+      });
+      const d = await r.json();
+      if (r.ok) {
+        showFeedback('✓ ' + d.message, 'ok');
+        checkCookies();
+      } else {
+        showFeedback('✗ ' + d.error, 'err');
+      }
+    } catch (e) {
+      showFeedback('✗ Upload failed: ' + e.message, 'err');
+    }
+  }
+
+  // File browse
+  $('cp-browse-btn').addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => uploadCookies(e.target.result);
+    reader.readAsText(file);
+  });
+
+  // Drag & drop
+  uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault(); uploadArea.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => uploadCookies(ev.target.result);
+    reader.readAsText(file);
+  });
+  uploadArea.addEventListener('click', () => fileInput.click());
+
+  // Clear
+  $('cp-clear-btn').addEventListener('click', async e => {
+    e.stopPropagation();
+    try {
+      await fetch(`${API}/api/cookies`, { method: 'DELETE' });
+      showFeedback('Cookies cleared', 'ok');
+      checkCookies();
+    } catch (_) { showFeedback('Failed to clear', 'err'); }
+  });
+})();

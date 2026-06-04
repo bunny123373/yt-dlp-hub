@@ -23,6 +23,7 @@ const YTDLP_ARGS = YTDLP_CMD.includes('python') ? ['-m', 'yt_dlp'] : [];
 // ── Directories ─────────────────────────────
 const DOWNLOADS_DIR = path.join(__dirname, 'downloads');
 const PUBLIC_DIR    = path.join(__dirname, '.');
+const COOKIES_FILE  = path.join(__dirname, 'yt-cookies.txt'); // optional user-supplied cookies
 if (!fs.existsSync(DOWNLOADS_DIR)) fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
 
 // ── In-memory job store ─────────────────────
@@ -30,17 +31,7 @@ if (!fs.existsSync(DOWNLOADS_DIR)) fs.mkdirSync(DOWNLOADS_DIR, { recursive: true
 const jobs = new Map();
 
 // ── Middleware ───────────────────────────────
-app.use(cors({
-  origin: [
-    'https://yt-dlp-hub.vercel.app',
-    'https://yt-dlp-1fsjvqqia-balujeswanths-projects.vercel.app',
-    'http://localhost:3001',
-    'http://localhost:5500',
-    'null' // file:// protocol for local dev
-  ],
-  methods: ['GET', 'POST'],
-  credentials: false
-}));
+app.use(cors({ origin: '*', methods: ['GET','POST'], credentials: false }));
 app.use(express.json());
 app.use(express.static(PUBLIC_DIR));
 
@@ -110,6 +101,18 @@ function buildYtdlpArgs(opts) {
   if (playlist)                  { args.push('--yes-playlist'); delete args[args.indexOf('--no-playlist')]; }
   if (cookies)                   { args.push('--cookies-from-browser', 'chrome'); }
   if (sponsor)                   { args.push('--sponsorblock-mark', 'all'); }
+
+  // YouTube-specific: bypass bot detection with iOS/Android player client
+  const isYouTube = /youtube\.com|youtu\.be/.test(url);
+  if (isYouTube) {
+    args.push('--extractor-args', 'youtube:player_client=ios,mweb');
+    args.push('--extractor-args', 'youtube:skip=dash');
+  }
+
+  // Use cookies file if it exists (user-uploaded)
+  if (fs.existsSync(COOKIES_FILE)) {
+    args.push('--cookies', COOKIES_FILE);
+  }
 
   args.push('--socket-timeout', '30');
   args.push('--retries', '3');
@@ -331,7 +334,31 @@ function attachHandlers(proc, job, jobId, opts) {
   });
 }
 
-// 2. Fetch video metadata (title, thumbnail, channel, duration)
+// 2. Upload YouTube cookies.txt (to bypass bot detection)
+app.post('/api/cookies', express.text({ type: '*/*', limit: '2mb' }), (req, res) => {
+  const body = req.body;
+  if (!body || !body.includes('youtube.com')) {
+    return res.status(400).json({ error: 'Invalid cookies file — must be Netscape format containing youtube.com cookies' });
+  }
+  try {
+    fs.writeFileSync(COOKIES_FILE, body, 'utf8');
+    res.json({ ok: true, message: 'Cookies saved — YouTube downloads now authenticated' });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to save cookies: ' + e.message });
+  }
+});
+
+app.get('/api/cookies/status', (req, res) => {
+  const exists = fs.existsSync(COOKIES_FILE);
+  res.json({ hasCookies: exists, path: exists ? COOKIES_FILE : null });
+});
+
+app.delete('/api/cookies', (req, res) => {
+  if (fs.existsSync(COOKIES_FILE)) fs.unlinkSync(COOKIES_FILE);
+  res.json({ ok: true });
+});
+
+// 3. Fetch video metadata (title, thumbnail, channel, duration)
 app.get('/api/info', (req, res) => {
   const { url } = req.query;
   if (!url || !url.startsWith('http')) {
