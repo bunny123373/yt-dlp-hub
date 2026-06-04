@@ -12,18 +12,13 @@ const path       = require('path');
 const fs         = require('fs');
 const { spawn }  = require('child_process');
 const { v4: uuid } = require('uuid');
-const ytDlp      = require('yt-dlp-exec');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
-// ── yt-dlp binary (from yt-dlp-exec, auto-downloaded on npm install) ─
-let YTDLP_CMD = process.env.YTDLP_CMD || 'yt-dlp';
-try {
-  // yt-dlp-exec: ^1.0.2 bundles the binary at bin/yt-dlp
-  YTDLP_CMD = require.resolve('yt-dlp-exec/bin/yt-dlp');
-} catch (_) {}
-const YTDLP_ARGS = [];
+// ── yt-dlp command ────────────────────────────────────
+const YTDLP_CMD  = process.env.YTDLP_CMD || 'yt-dlp';
+const YTDLP_ARGS = YTDLP_CMD.includes('python') ? ['-m', 'yt_dlp'] : [];
 
 // ── Directories ─────────────────────────────
 const DOWNLOADS_DIR = path.join(__dirname, 'downloads');
@@ -386,37 +381,45 @@ app.delete('/api/cookies', (req, res) => {
   res.json({ ok: true });
 });
 
-// 3. Fetch video metadata using yt-dlp-exec
-app.get('/api/info', async (req, res) => {
+// 3. Fetch video metadata
+app.get('/api/info', (req, res) => {
   const { url } = req.query;
   if (!url || !url.startsWith('http')) {
     return res.status(400).json({ error: 'Invalid URL' });
   }
-  try {
-    const extraArgs = {};
-    if (fs.existsSync(COOKIES_FILE)) extraArgs.cookies = COOKIES_FILE;
-    const info = await ytDlp(url, {
-      dumpSingleJson:    true,
-      noPlaylist:        true,
-      noWarnings:        true,
-      socketTimeout:     20,
-      extractorArgs:     'youtube:player_client=tv_embedded,ios,web',
-      ...extraArgs,
-    });
-    res.json({
-      title:       info.title        || 'Unknown Title',
-      thumbnail:   info.thumbnail    || null,
-      uploader:    info.uploader     || info.channel || null,
-      duration:    info.duration     || null,
-      view_count:  info.view_count   || null,
-      upload_date: info.upload_date  || null,
-      extractor:   info.extractor    || null,
-    });
-  } catch (e) {
-    const msg = (e.stderr || e.message || 'Could not fetch info').split('\n')
-      .filter(l => l.trim() && !l.includes('WARNING')).pop() || 'Could not fetch info';
-    res.status(500).json({ error: msg.replace(/^ERROR:\s*/i, '') });
-  }
+
+  const args = [...YTDLP_ARGS,
+    '--dump-json', '--no-playlist', '--no-warnings',
+    '--socket-timeout', '20',
+    '--extractor-args', 'youtube:player_client=tv_embedded,ios,web',
+  ];
+  if (fs.existsSync(COOKIES_FILE)) args.push('--cookies', COOKIES_FILE);
+  args.push(url);
+
+  const proc = spawn(YTDLP_CMD, args);
+  let out = '', err = '';
+  proc.stdout.on('data', c => { out += c; });
+  proc.stderr.on('data', c => { err += c; });
+  proc.on('error', e => res.status(500).json({ error: e.message }));
+  proc.on('close', code => {
+    if (code === 0) {
+      try {
+        const d = JSON.parse(out.trim().split('\n')[0]);
+        res.json({
+          title:       d.title       || 'Unknown',
+          thumbnail:   d.thumbnail   || null,
+          uploader:    d.uploader    || d.channel || null,
+          duration:    d.duration    || null,
+          view_count:  d.view_count  || null,
+          upload_date: d.upload_date || null,
+          extractor:   d.extractor   || null,
+        });
+      } catch (e) { res.status(500).json({ error: 'Parse error' }); }
+    } else {
+      const msg = err.split('\n').filter(l => l.trim() && !l.includes('WARNING')).pop() || 'Failed';
+      res.status(500).json({ error: msg.replace(/^ERROR:\s*/i, '') });
+    }
+  });
 });
 
 function sendInfo(res, rawJson) {
