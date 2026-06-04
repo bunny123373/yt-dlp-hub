@@ -12,6 +12,7 @@ const path       = require('path');
 const fs         = require('fs');
 const { spawn }  = require('child_process');
 const { v4: uuid } = require('uuid');
+const ytDlp      = require('yt-dlp-exec');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -382,44 +383,16 @@ app.delete('/api/cookies', (req, res) => {
 });
 
 // 3. Fetch video metadata
-app.get('/api/info', (req, res) => {
-  const { url } = req.query;
-  if (!url || !url.startsWith('http')) {
-    return res.status(400).json({ error: 'Invalid URL' });
+app.get('/api/info', async (req, res) => {
+  try {
+    const data = await ytDlp(req.query.url, {
+      dumpSingleJson: true,
+      ...(fs.existsSync(COOKIES_FILE) ? { cookies: COOKIES_FILE } : {}),
+    });
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.stderr || e.message });
   }
-
-  const args = [...YTDLP_ARGS,
-    '--dump-json', '--no-playlist', '--no-warnings',
-    '--socket-timeout', '20',
-    '--extractor-args', 'youtube:player_client=tv_embedded,ios,web',
-  ];
-  if (fs.existsSync(COOKIES_FILE)) args.push('--cookies', COOKIES_FILE);
-  args.push(url);
-
-  const proc = spawn(YTDLP_CMD, args);
-  let out = '', err = '';
-  proc.stdout.on('data', c => { out += c; });
-  proc.stderr.on('data', c => { err += c; });
-  proc.on('error', e => res.status(500).json({ error: e.message }));
-  proc.on('close', code => {
-    if (code === 0) {
-      try {
-        const d = JSON.parse(out.trim().split('\n')[0]);
-        res.json({
-          title:       d.title       || 'Unknown',
-          thumbnail:   d.thumbnail   || null,
-          uploader:    d.uploader    || d.channel || null,
-          duration:    d.duration    || null,
-          view_count:  d.view_count  || null,
-          upload_date: d.upload_date || null,
-          extractor:   d.extractor   || null,
-        });
-      } catch (e) { res.status(500).json({ error: 'Parse error' }); }
-    } else {
-      const msg = err.split('\n').filter(l => l.trim() && !l.includes('WARNING')).pop() || 'Failed';
-      res.status(500).json({ error: msg.replace(/^ERROR:\s*/i, '') });
-    }
-  });
 });
 
 function sendInfo(res, rawJson) {

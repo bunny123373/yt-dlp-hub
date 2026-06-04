@@ -20,7 +20,7 @@ WORKDIR /app
 
 # Install Node deps first (layer cache)
 COPY package*.json ./
-RUN npm install --production
+RUN npm install --production --ignore-scripts
 
 # Copy source
 COPY . .
