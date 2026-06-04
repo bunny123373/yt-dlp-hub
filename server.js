@@ -18,7 +18,11 @@ const app  = express();
 const PORT = process.env.PORT || 3001;
 
 // ── yt-dlp binary (from yt-dlp-exec, auto-downloaded on npm install) ─
-const YTDLP_CMD  = process.env.YTDLP_CMD || ytDlp.path || 'yt-dlp';
+let YTDLP_CMD = process.env.YTDLP_CMD || 'yt-dlp';
+try {
+  // yt-dlp-exec: ^1.0.2 bundles the binary at bin/yt-dlp
+  YTDLP_CMD = require.resolve('yt-dlp-exec/bin/yt-dlp');
+} catch (_) {}
 const YTDLP_ARGS = [];
 
 // ── Directories ─────────────────────────────
