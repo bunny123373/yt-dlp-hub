@@ -30,7 +30,17 @@ if (!fs.existsSync(DOWNLOADS_DIR)) fs.mkdirSync(DOWNLOADS_DIR, { recursive: true
 const jobs = new Map();
 
 // ── Middleware ───────────────────────────────
-app.use(cors({ origin: '*' }));
+app.use(cors({
+  origin: [
+    'https://yt-dlp-hub.vercel.app',
+    'https://yt-dlp-1fsjvqqia-balujeswanths-projects.vercel.app',
+    'http://localhost:3001',
+    'http://localhost:5500',
+    'null' // file:// protocol for local dev
+  ],
+  methods: ['GET', 'POST'],
+  credentials: false
+}));
 app.use(express.json());
 app.use(express.static(PUBLIC_DIR));
 
